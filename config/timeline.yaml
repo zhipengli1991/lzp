@@ -9,7 +9,7 @@
 # 只需在 config.yaml 中选择一个预设模板即可：
 #
 #   schedule:
-#     preset: "morning_evening"    ← 改这里就行
+#     preset: "office_hours"    ← 改这里就行
 #
 #
 # 可视化配置编辑器地址: https://sansan0.github.io/TrendRadar/
@@ -395,8 +395,8 @@ presets:
 #     其余时间走默认配置（静默采集）
 
 custom:
-  name: "自定义"
-  description: "完全自由定义时间段、日计划和周映射。"
+  name: "每日早报"
+  description: "每天早上6-9点发送一次当日汇总报告。"
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # 默认配置
@@ -417,29 +417,6 @@ custom:
                                    #   daily       → 当日所有新闻的汇总
                                    #   current     → 当前在榜的新闻
                                    #   incremental → 只推送新增内容
-
-                                   
-    # frequency_file: "general.txt"
-                                   # 关键词文件（可选，位于 config/custom/keyword/）
-                                   # 不填则使用默认的 config/frequency_words.txt
-                                   # 时间段（period）中也可以设置此字段来覆盖默认值
-                                   # 例如晚间汇总用科技词库：
-                                   #   frequency_file: "tech.txt"
-                                   # 注意：仅在 filter_method 为 keyword 时生效
-                                   
-    # interests_file: "finance.txt"
-                                   # AI 兴趣描述文件（可选，位于 config/custom/ai/）
-                                   # 不填则使用默认的 config/ai_interests.txt
-                                   # 时间段（period）中也可以设置此字段来覆盖默认值
-                                   # 例如晚间汇总用金融兴趣：
-                                   #   interests_file: "finance.txt"
-                                   # 注意：仅在 filter_method 为 ai 时生效
-
-    # filter_method: "keyword"     # 筛选策略（可选: keyword | ai）
-                                   # 不填则使用全局 config.yaml 的 filter.method
-                                   # 时间段（period）中也可以设置此字段来覆盖
-                                   # 例如晚间汇总用 AI 筛选：
-                                   #   filter_method: "ai"
     once:
       analyze: true                # 该时间段内只分析一次（省 API）
       push: true                   # 该时间段内只推送一次（省打扰）
@@ -448,76 +425,29 @@ custom:
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # 第 1 步：定义积木块（时间段）
   #
-  # 每个时间段有一个唯一的 key（如 deep_quiet），
-  # 以及 start / end 表示生效的时间范围。
-  #
-  # 只需要写「和 default 不同的字段」，其余自动继承 default。
-  # 例如 weekday_morning 没写 collect，就会继承 default 的 collect: true。
-  #
-  # 提示：如果 start > end（如 22:00 → 07:00），
-  #       系统会自动识别为跨越午夜的时间段。
+  # 每天早间发送一次当日汇总
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   periods:
 
-    deep_quiet:
-      name: "深夜静默"
-      start: "23:00"
-      end: "06:00"                 # 23:00 → 次日 06:00（跨日时间段）
-      # frequency_file: "xxx.txt"               # 关键词文件（可选，位于 config/custom/keyword/）
-      # interests_file: "xxx.txt"                # AI 兴趣文件（可选，位于 config/custom/ai/）
-      # filter_method: "keyword"                # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
-      collect: true                # 夜间继续采集数据
-      analyze: true                # 夜间可以跑 AI 分析（反正不推送）
-      push: false                  # 深夜不推送，避免打扰
-
-    weekday_morning:
-      name: "工作日早间"
-      start: "08:00"
-      end: "10:00"                 # 跨度 2h，留足触发裕量
-      # frequency_file: "xxx.txt"               # 关键词文件（可选，位于 config/custom/keyword/）
-      # interests_file: "xxx.txt"                # AI 兴趣文件（可选，位于 config/custom/ai/）
-      # filter_method: "keyword"                # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
-      push: true                   # 早上推送一次
-      report_mode: "incremental"   # 只推新增内容
-      # once 继承 default（push: true）→ 窗口内只推一次
-
-    weekend_morning:
-      name: "周末早间"
-      start: "10:00"
-      end: "12:00"                 # 跨度 2h
-      # frequency_file: "xxx.txt"               # 关键词文件（可选，位于 config/custom/keyword/）
-      # interests_file: "xxx.txt"                # AI 兴趣文件（可选，位于 config/custom/ai/）
-      # filter_method: "keyword"                # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
-      push: true
-      report_mode: "daily"         # 周末看全天汇总
-      # once 继承 default（push: true）→ 窗口内只推一次
-
-    evening_summary:
-      name: "晚间汇总"
-      start: "19:00"
-      end: "21:00"
-      # frequency_file: "xxx.txt"               # 关键词文件（可选，位于 config/custom/keyword/）
-      # interests_file: "xxx.txt"                # AI 兴趣文件（可选，位于 config/custom/ai/）
-      # filter_method: "keyword"                # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
-      analyze: true                # 晚间做 AI 分析
-      ai_mode: "daily"             # AI 也分析全天内容
-      push: true                   # 晚间推送
+    morning_summary:
+      name: "早间汇总"
+      start: "06:00"
+      end: "09:00"
+      analyze: true                # 早上做 AI 分析
+      ai_mode: "daily"             # 分析全天内容
+      push: true                   # 早上推送
       report_mode: "daily"         # 当日全部新闻汇总
-      # once 继承 default（analyze: true, push: true）→ 只分析/推送一次
+      once:
+        analyze: true              # 只分析一次
+        push: true                # 只推送一次
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # 第 2 步：把积木块拼成日计划
-  #
-  # 把上面定义的时间段组合成一天的安排。
-  # 你可以定义多个日计划（如 workday 和 weekend），
-  # 然后在第 3 步的 week_map 中分配给不同的星期。
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   day_plans:
-    workday:                       # 工作日计划
-      periods: ["deep_quiet", "weekday_morning", "evening_summary"]
-    weekend:                       # 周末计划（用 weekend_morning 替换 weekday_morning）
-      periods: ["deep_quiet", "weekend_morning", "evening_summary"]
+    every_day:
+      periods: ["morning_summary"]
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -526,13 +456,13 @@ custom:
   # 1=周一  2=周二  3=周三  4=周四  5=周五  6=周六  7=周日
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   week_map:
-    1: "workday"                   # 周一 → 工作日计划
-    2: "workday"                   # 周二
-    3: "workday"                   # 周三
-    4: "workday"                   # 周四
-    5: "workday"                   # 周五
-    6: "weekend"                   # 周六 → 周末计划
-    7: "weekend"                   # 周日
+    1: "every_day"                # 每天
+    2: "every_day"
+    3: "every_day"
+    4: "every_day"
+    5: "every_day"
+    6: "every_day"
+    7: "every_day"
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
